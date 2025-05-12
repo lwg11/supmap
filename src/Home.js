@@ -4,14 +4,14 @@ import ToolContext from './ToolContext'
 
 
 export default function Home(props) {
-    const [user, setUser] = useState();
-    const [map, setMap] = useState();
+    // const [user, setUser] = useState();
+    // const [map, setMap] = useState();
 
     return (
         <ToolContext.Provider value={{
-            map, setMap,
+            // map, setMap,
         }}>
-            <div className="Home">
+            <div style={{ width: '100%', height: '100%' }} className="Home">
                 <Map />
             </div>
         </ToolContext.Provider>
