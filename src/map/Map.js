@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Popover } from "antd";
 import L from 'leaflet';
+import './map.css';
 import '@supermapgis/iclient-leaflet';
 import { TiledMapLayer } from '@supermapgis/iclient-leaflet';
+
+// import useMapInit from './hooks/useMapInit';
+// import LayerManager from './components/LayerManager';
+// import Controls from './components/Controls';
+// import { useMarkers } from './utils/markers';
 
 const host = "https://iserver.supermap.io";
 
@@ -9,6 +16,8 @@ export default function Map(props) {
 	const mapRef = useRef(null);
 	const mapContainerRef = useRef(null);
 	const layersRef = useRef({});
+	const [coordinate, setCoordinates] = useState({ lat: 0, lng: 0 });
+	const [popupData, setPopupData] = useState({});
 
 	useEffect(() => {
 		if (mapRef.current) return;
@@ -21,7 +30,6 @@ export default function Map(props) {
 			zoom: 4,
 		});
 
-		// 创建基础图层
 		const baseLayers = {
 			"China": new L.supermap.TiledMapLayer(
 				'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China_4326',
@@ -32,24 +40,63 @@ export default function Map(props) {
 				{ noWrap: true }
 			),
 		};
-		// 默认添加一个图层
 		baseLayers.China.addTo(map);
-		// 存储实例
 		layersRef.current = baseLayers;
 		mapRef.current = map;
-		// 添加图层切换控件
+
 		L.control.layers(baseLayers).addTo(map);
 		L.control.scale().addTo(map);
 
-		var BJ = L.marker([39.830660058696104, 116.92866163503169]).bindPopup('北京市'),
-			CD = L.marker([30.40, 104.04]).bindPopup('成都市');
+		const customIcon = L.icon({
+			iconUrl: require('./img/定位.png'),
+			shadowUrl: '/marker-shadow.png',
+			iconSize: [35, 40], // 图标尺寸
+		});
 
-		var cities = L.layerGroup([BJ, CD]).addTo(map);
+		let CD = L.marker([30.40, 104.04]).bindPopup('成都市');
+
+
+		const highlightIcon = L.icon({
+			iconUrl: require('./img/定位2.png'),
+			iconSize: [40, 45]
+		});
+
+		const handleMarkerClick = (e) => {
+			const { latlng } = e;
+			console.log('dianji--->',e);
+			setPopupData(e.target._popup)
+			setCoordinates(latlng)
+		};
+
+		const handleMarkerHover = (e) => {
+			const { target } = e;
+			target.setIcon(highlightIcon);
+		};
+
+		const handleMarkerLeave = (e) => {
+			e.target.setIcon(customIcon);
+		}
+
+		const bindMarkerEvents = (marker) => {
+			marker
+				.on('click', handleMarkerClick)
+				.on('mouseover', handleMarkerHover)
+				.on('mouseout', handleMarkerLeave);
+		}
+
+		var BJ = L.marker([39.830660058696104, 116.92866163503169], {
+			icon: customIcon
+
+		}).bindPopup('北京市');
+		bindMarkerEvents(BJ);
+
+
+
+		let cities = L.layerGroup([BJ, CD]).addTo(map);
 
 		L.control.layers(baseLayers, {
 			"标记": cities
 		}).addTo(map);
-
 
 		return () => {
 			map.remove();
@@ -59,11 +106,17 @@ export default function Map(props) {
 		};
 	}, []);
 
+
+
 	return (
-		<div style={{ width: "100%", height: "100%" }}>
-			{/* // 地图显示的div */}
+		<div className='flex' style={{ width: "100%", height: "100%" }}>
+			<div>
+				<div className='flex'>坐标:</div>
+				<div className='flex'>{popupData?._content}</div>
+				<div>{coordinate.lat},{coordinate.lng}</div>
+			</div>
 			<div
-				ref={mapContainerRef} // 使用 ref 引用地图容器
+				ref={mapContainerRef}
 				id="map"
 				style={{ position: "absolute", top: '20px', right: '20px', width: "900px", height: "600px" }}
 			></div>

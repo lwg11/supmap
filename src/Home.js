@@ -11,7 +11,7 @@ export default function Home(props) {
         <ToolContext.Provider value={{
             // map, setMap,
         }}>
-            <div style={{ width: '100%', height: '100%' }} className="Home">
+            <div style={{ width: '100%', height: '100%',padding:'10px' }} className="Home">
                 <Map />
             </div>
         </ToolContext.Provider>
