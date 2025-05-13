@@ -3,42 +3,73 @@ import L from 'leaflet';
 // import '@supermapgis/iclient-leaflet';
 import { TiledMapLayer } from '@supermapgis/iclient-leaflet';
 
+let vec_c = 'http://t0.tianditu.gov.cn/vec_c/wmts?tk=38c85d6a0ba2503c80c339d1a9c684b3'
+let img_c = 'http://t0.tianditu.gov.cn/img_c/wmts?tk=38c85d6a0ba2503c80c339d1a9c684b3'
+
 export default function Map(props) {
 	const mapRef = useRef(null);
-	const mapContainerRef = useRef(null); // 新增 ref 用于引用地图容器
-	const url = "https://iserver.supermap.io/iserver/services/map-world/rest/maps/World";
-	var China = new L.supermap.TiledMapLayer(url + '/iserver/services/map-china400/rest/maps/China', { noWrap: true });
-	var ChinaDark = new L.supermap.TiledMapLayer(url + '/iserver/services/map-china400/rest/maps/ChinaDark', { noWrap: true });
+	const mapContainerRef = useRef(null);
+	const layersRef = useRef({});
 
 	useEffect(() => {
-		if (mapRef.current) return; // 防止重复初始化
+		if (mapRef.current) return;
 
-		const map = L.map('mapbox', {
+		const map = L.map('map', {
 			crs: L.CRS.EPSG4326,
-			center: [0, 0],
+			// center: [40, 117],
+			center: [33, 114],
 			maxZoom: 18,
-			zoom: 1,
-			layers: [China, ChinaDark]
+			// zoom: 8,
+			zoom: 4,
 		});
 
-		const layer = new TiledMapLayer(url);
-		layer.addTo(map);
+		// 创建基础图层
+		const baseLayers = {
+			"China": new L.supermap.TiledMapLayer(
+				'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China_4326',
+				{ noWrap: true }
+			),
+			"China111": new L.supermap.TiledMapLayer(
+				'https://iserver.supermap.io/iserver/services/map-jingjin/rest/maps/京津地区地图',
+				{ noWrap: true }
+			),
+		};
+		// 默认添加一个图层
+		baseLayers.China.addTo(map);
+		// 存储实例
+		layersRef.current = baseLayers;
+		mapRef.current = map;
+		// 添加图层切换控件
+		L.control.layers(baseLayers).addTo(map);
+		// L.control.scale().addTo(map);
 
-		mapRef.current = map; // 存储地图实例
+		
 
 
 
-		var baseMaps = { "China": China, "ChinaDark": ChinaDark };
-// 添加图层切换控件
-L.control.layers(baseMaps).addTo(map);
 
 
-		// 清理函数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		return () => {
-			if (mapRef.current) {
-				mapRef.current.remove();
-				mapRef.current = null;
-			}
+			map.remove();
+			mapRef.current = null;
+			// 清理图层
+			Object.values(layersRef.current).forEach(layer => layer.remove());
 		};
 	}, []);
 
@@ -47,8 +78,8 @@ L.control.layers(baseMaps).addTo(map);
 			{/* // 地图显示的div */}
 			<div
 				ref={mapContainerRef} // 使用 ref 引用地图容器
-				id="mapbox"
-				style={{ position: "absolute", left: '0px', right: '0px', width: "800px", height: "500px" }}
+				id="map"
+				style={{ position: "absolute",top:'20px', right: '20px', width: "900px", height: "600px" }}
 			></div>
 		</div>
 	);
