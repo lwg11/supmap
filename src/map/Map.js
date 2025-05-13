@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
-// import '@supermapgis/iclient-leaflet';
+import '@supermapgis/iclient-leaflet';
 import { TiledMapLayer } from '@supermapgis/iclient-leaflet';
 
-let vec_c = 'http://t0.tianditu.gov.cn/vec_c/wmts?tk=38c85d6a0ba2503c80c339d1a9c684b3'
-let img_c = 'http://t0.tianditu.gov.cn/img_c/wmts?tk=38c85d6a0ba2503c80c339d1a9c684b3'
+const host = "https://iserver.supermap.io";
 
 export default function Map(props) {
 	const mapRef = useRef(null);
@@ -19,7 +18,6 @@ export default function Map(props) {
 			// center: [40, 117],
 			center: [33, 114],
 			maxZoom: 18,
-			// zoom: 8,
 			zoom: 4,
 		});
 
@@ -29,7 +27,7 @@ export default function Map(props) {
 				'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China_4326',
 				{ noWrap: true }
 			),
-			"China111": new L.supermap.TiledMapLayer(
+			"beijing": new L.supermap.TiledMapLayer(
 				'https://iserver.supermap.io/iserver/services/map-jingjin/rest/maps/京津地区地图',
 				{ noWrap: true }
 			),
@@ -41,28 +39,16 @@ export default function Map(props) {
 		mapRef.current = map;
 		// 添加图层切换控件
 		L.control.layers(baseLayers).addTo(map);
-		// L.control.scale().addTo(map);
+		L.control.scale().addTo(map);
 
-		
+		var BJ = L.marker([39.830660058696104, 116.92866163503169]).bindPopup('北京市'),
+			CD = L.marker([30.40, 104.04]).bindPopup('成都市');
 
+		var cities = L.layerGroup([BJ, CD]).addTo(map);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		L.control.layers(baseLayers, {
+			"标记": cities
+		}).addTo(map);
 
 
 		return () => {
@@ -79,7 +65,7 @@ export default function Map(props) {
 			<div
 				ref={mapContainerRef} // 使用 ref 引用地图容器
 				id="map"
-				style={{ position: "absolute",top:'20px', right: '20px', width: "900px", height: "600px" }}
+				style={{ position: "absolute", top: '20px', right: '20px', width: "900px", height: "600px" }}
 			></div>
 		</div>
 	);
