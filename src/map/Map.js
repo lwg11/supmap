@@ -3,10 +3,10 @@ import { Popover } from "antd";
 import L from 'leaflet';
 import './map.css';
 import '@supermapgis/iclient-leaflet';
-import { TiledMapLayer } from '@supermapgis/iclient-leaflet';
+import { TiledMapLayer,TiledVectorLayer } from '@supermapgis/iclient-leaflet';
 
-// let jj = 'https://iserver.supermap.io/iserver/services/map-Jingjin/restjsr/v1/vectortile/maps/%E4%BA%AC%E6%B4%A5%E5%9C%B0%E5%8C%BA%E5%9C%B0%E5%9B%BE'
-let jj = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China'
+let jj = 'https://iserver.supermap.io/iserver/services/map-Jingjin/rest/maps/京津地区地图'
+const BOUNDARY_LAYER_URL = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China';
 
 const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayLayerChange, activeBaseLayer }) => {
 	return (
@@ -111,7 +111,8 @@ export default function Map() {
 	const [coordinate, setCoordinates] = useState({ lat: 0, lng: 0 });
 	const [popupData, setPopupData] = useState({});
 	const [activeMarker, setActiveMarker] = useState({ show: false });
-	const key = 'd9ca48dbdb5340a322938f75d26e11fd';
+	const key = '38c85d6a0ba2503c80c339d1a9c684b3';
+	// const key = 'd9ca48dbdb5340a322938f75d26e11fd';
 
 	const [activeBaseLayer, setActiveBaseLayer] = useState('vec');
 	const [activeOverlayLayers, setActiveOverlayLayers] = useState([]);
@@ -156,12 +157,12 @@ export default function Map() {
 
 	useEffect(() => {
 		if (mapRef.current) return;
-
+		
 		const map = L.map('map', {
 			crs: L.supermap.CRS.TianDiTu_Mercator,
 			center: [33, 114],
 			maxZoom: 18,
-			zoom: 4,
+			zoom: 5,
 		});
 
 		const baseLayers = {
@@ -189,8 +190,21 @@ export default function Map() {
 
 		const jjLayer = new L.supermap.TiledVectorLayer(jj, {
 			cacheEnabled: true,
-			returnAttributes: true,
+			returnAttributes: true
 		});
+
+		const boundaryLayer = new L.supermap.TiledMapLayer(BOUNDARY_LAYER_URL, {
+			// transparent: true,
+			// cacheEnabled: true,
+			// opacity: 0.8
+			styles: {
+				fillColor: 'red',
+				strokeColor: '#ff0000',
+				weight: 2
+			},
+			cacheEnabled: true
+		});
+		
 
 		let selectId = null;
 		let selectLayerName = null;
@@ -206,6 +220,9 @@ export default function Map() {
 		jjLayer.on('click', function (evt) {
 			var id = evt.layer.properties.id;
 			var layerName = evt.layer.layerName;
+			console.log('click=id==>',id);
+			console.log('click=layerName==>',layerName);
+			
 			clearHighlight();
 			selectId = id;
 			selectLayerName = layerName;
@@ -244,14 +261,12 @@ export default function Map() {
 		complexMarkerEventHandler(BJ, setPopupData, setCoordinates, setActiveMarker, mapRef, customIcon, highlightIcon);
 		complexMarkerEventHandler(CD, setPopupData, setCoordinates, setActiveMarker, mapRef, customIcon, highlightIcon);
 
-
-
 		const cities = L.layerGroup([BJ, CD]);
-		// const marks = { "标记": cities };
 
 		const marks = {
 			"标记": cities,
-			"jj图层": jjLayer // 添加新图层到叠加层
+			"jj图层": jjLayer,
+			"行政区划": boundaryLayer // 新增图层
 		};
 
 		layersRef.current = {
@@ -283,16 +298,10 @@ export default function Map() {
 					<div className='flex'>{coordinate.lat},{coordinate.lng}</div>
 				</div>
 				<div className='layerControl-box'>
-					{/* <LayerControl
-						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
-						overlayLayers={{ "标记": "城市标记" }}
-						onBaseLayerChange={handleBaseLayerChange}
-						onOverlayLayerChange={handleOverlayLayerChange}
-						activeBaseLayer={activeBaseLayer}
-					/> */}
 					<LayerControl
 						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
-						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层" }}
+						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层","行政区划": "省级边界" }}
+						// overlayLayers={{ "标记": "城市标记"}}
 						onBaseLayerChange={handleBaseLayerChange}
 						onOverlayLayerChange={handleOverlayLayerChange}
 						activeBaseLayer={activeBaseLayer}
