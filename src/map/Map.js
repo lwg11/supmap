@@ -194,17 +194,10 @@ export default function Map() {
 		});
 
 		const boundaryLayer = new L.supermap.TiledMapLayer(BOUNDARY_LAYER_URL, {
-			// transparent: true,
-			// cacheEnabled: true,
-			// opacity: 0.8
-			styles: {
-				fillColor: 'red',
-				strokeColor: '#ff0000',
-				weight: 2
-			},
-			cacheEnabled: true
+			transparent: true,
+			cacheEnabled: true,
+			opacity: 0.8
 		});
-		
 
 		let selectId = null;
 		let selectLayerName = null;
@@ -266,7 +259,7 @@ export default function Map() {
 		const marks = {
 			"标记": cities,
 			"jj图层": jjLayer,
-			"行政区划": boundaryLayer // 新增图层
+			"行政区划": boundaryLayer
 		};
 
 		layersRef.current = {
