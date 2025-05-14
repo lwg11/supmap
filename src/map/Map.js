@@ -12,28 +12,44 @@ export default function Map(props) {
 	const [coordinate, setCoordinates] = useState({ lat: 0, lng: 0 });
 	const [popupData, setPopupData] = useState({});
 	const [activeMarker, setActiveMarker] = useState({ show: false });
+	let key = 'd9ca48dbdb5340a322938f75d26e11fd';
 
 	useEffect(() => {
 		if (mapRef.current) return;
 
 		const map = L.map('map', {
-			crs: L.CRS.EPSG4326,
+			crs: L.supermap.CRS.TianDiTu_Mercator,
 			center: [33, 114],
 			maxZoom: 18,
 			zoom: 4,
 		});
 
 		const baseLayers = {
-			"China": new L.supermap.TiledMapLayer(
-				'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China_4326',
-				{ noWrap: true }
-			),
-			"beijing": new L.supermap.TiledMapLayer(
-				'https://iserver.supermap.io/iserver/services/map-jingjin/rest/maps/京津地区地图',
-				{ noWrap: true }
-			),
+			"vec": new L.supermap.TiandituTileLayer({
+				layerType: "vec",
+				key: key,
+			}),
+			"img": new L.supermap.TiandituTileLayer({
+				layerType: "img",
+				key: key,
+			}),
+			
 		};
-		baseLayers.China.addTo(map);
+		const baseLayersLabel = {
+			"vec": new L.supermap.TiandituTileLayer({
+				layerType: "vec",
+				isLabel: true,
+				key: key,
+			}),
+			"img": new L.supermap.TiandituTileLayer({
+				layerType: "img",
+				isLabel: true,
+				key: key,
+			}),
+		};
+		baseLayers.vec.addTo(map);
+		baseLayersLabel.vec.addTo(map);
+
 		layersRef.current = baseLayers;
 		mapRef.current = map;
 
