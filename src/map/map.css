@@ -2,6 +2,10 @@
     display: flex;
 }
 
+.text-left {
+    text-align: left;
+}
+
 .layerControl-box {
     display: flex;
     border: 1px solid;

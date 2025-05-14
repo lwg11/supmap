@@ -5,7 +5,8 @@ import './map.css';
 import '@supermapgis/iclient-leaflet';
 import { TiledMapLayer } from '@supermapgis/iclient-leaflet';
 
-let jj = 'https://iserver.supermap.io/iserver/services/map-Jingjin/restjsr/v1/vectortile/maps/%E4%BA%AC%E6%B4%A5%E5%9C%B0%E5%8C%BA%E5%9C%B0%E5%9B%BE'
+// let jj = 'https://iserver.supermap.io/iserver/services/map-Jingjin/restjsr/v1/vectortile/maps/%E4%BA%AC%E6%B4%A5%E5%9C%B0%E5%8C%BA%E5%9C%B0%E5%9B%BE'
+let jj = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China'
 
 const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayLayerChange, activeBaseLayer }) => {
 	return (
@@ -23,9 +24,9 @@ const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayL
 					<label htmlFor={name}>{layer}</label>
 				</div>
 			))}
-			<h4>图层</h4>
+			<h4>图层控制</h4>
 			{Object.entries(overlayLayers).map(([name, layer]) => (
-				<div key={name}>
+				<div key={name} className='text-left'>
 					<input
 						type="checkbox"
 						id={name}
@@ -73,7 +74,7 @@ const complexMarkerEventHandler = (marker, setPopupData, setCoordinates, setActi
 };
 
 const complexLayerManager = (map, baseLayers, baseLayersLabel, activeBaseLayer, overlayLayers, activeOverlayLayers) => {
-	// 定义一个辅助函数用于移除图层
+	// 辅助移除图层
 	const removeLayersFromMap = (layerCollection) => {
 		Object.values(layerCollection).forEach(layer => {
 			if (layer && layer.removeFrom) {
@@ -82,11 +83,9 @@ const complexLayerManager = (map, baseLayers, baseLayersLabel, activeBaseLayer, 
 		});
 	};
 
-	// 移除所有底图图层
 	removeLayersFromMap(baseLayers);
 	removeLayersFromMap(baseLayersLabel);
 
-	// 添加当前激活的底图图层
 	if (baseLayers[activeBaseLayer]) {
 		baseLayers[activeBaseLayer].addTo(map);
 	}
@@ -188,6 +187,12 @@ export default function Map() {
 			}),
 		};
 
+		// // 创建新图层 TiledVectorLayer
+		const jjLayer = new L.supermap.TiledVectorLayer(jj,{
+			cacheEnabled: true,
+			returnAttributes: true,
+		});
+
 		baseLayers[activeBaseLayer].addTo(map);
 		baseLayersLabel[activeBaseLayer].addTo(map);
 
@@ -211,8 +216,16 @@ export default function Map() {
 		complexMarkerEventHandler(BJ, setPopupData, setCoordinates, setActiveMarker, mapRef, customIcon, highlightIcon);
 		complexMarkerEventHandler(CD, setPopupData, setCoordinates, setActiveMarker, mapRef, customIcon, highlightIcon);
 
+
+
 		const cities = L.layerGroup([BJ, CD]);
-		const marks = { "标记": cities };
+		// const marks = { "标记": cities };
+
+		const marks = { 
+			"标记": cities,
+			"jj图层": jjLayer // 添加新图层到叠加层
+		};
+
 		layersRef.current = {
 			baseLayers,
 			baseLayersLabel,
@@ -242,9 +255,16 @@ export default function Map() {
 					<div className='flex'>{coordinate.lat},{coordinate.lng}</div>
 				</div>
 				<div className='layerControl-box'>
-					<LayerControl
+					{/* <LayerControl
 						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
 						overlayLayers={{ "标记": "城市标记" }}
+						onBaseLayerChange={handleBaseLayerChange}
+						onOverlayLayerChange={handleOverlayLayerChange}
+						activeBaseLayer={activeBaseLayer}
+					/> */}
+					<LayerControl
+						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
+						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层" }} 
 						onBaseLayerChange={handleBaseLayerChange}
 						onOverlayLayerChange={handleOverlayLayerChange}
 						activeBaseLayer={activeBaseLayer}
