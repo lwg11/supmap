@@ -8,7 +8,7 @@ import { TiledMapLayer } from '@supermapgis/iclient-leaflet';
 // 自定义图层切换控件组件
 const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayLayerChange }) => {
 	return (
-		<div style={{ position: 'absolute', top: '20px', left: '20px', zIndex: 1000, background: 'white', padding: '10px', borderRadius: '5px' }}>
+		<div style={{ top: '20px', left: '20px', zIndex: 1000, background: 'white', padding: '10px', borderRadius: '5px' }}>
 			<h4>底图</h4>
 			{Object.entries(baseLayers).map(([name, layer]) => (
 				<div key={name}>
@@ -190,29 +190,35 @@ export default function Map(props) {
 		return () => {
 			map.remove();
 			mapRef.current = null;
+			// Object.values(layersRef.current.baseLayers).forEach(layer => layer?.remove());
+			// Object.values(layersRef.current.baseLayersLabel).forEach(layer => layer?.remove());
+			// Object.values(layersRef.current.overlayLayers).forEach(layer => layer?.remove());
 		};
 	}, [activeBaseLayer]);
 
 	return (
 		<div className='flex' style={{ width: "100%", height: "100%" }}>
 			<div>
-				<div className='flex'>坐标:</div>
-				<div className='flex'>{popupData?._content}</div>
-				<div>{coordinate.lat},{coordinate.lng}</div>
+				<div>
+					<div className='flex'>坐标:</div>
+					<div className='flex'>{popupData?._content}</div>
+					<div className='flex'>{coordinate.lat},{coordinate.lng}</div>
+				</div>
+				<div className='layerControl-box'>
+					<LayerControl
+						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
+						overlayLayers={{ "标记": "城市标记" }}
+						onBaseLayerChange={handleBaseLayerChange}
+						onOverlayLayerChange={handleOverlayLayerChange}
+					/>
+				</div>
 			</div>
+
 			<div
 				ref={mapContainerRef}
 				id="map"
 				style={{ position: "absolute", top: '20px', right: '20px', width: "900px", height: "600px" }}
 			></div>
-
-			<LayerControl
-				baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
-				overlayLayers={{ "标记": "城市标记" }}
-				onBaseLayerChange={handleBaseLayerChange}
-				onOverlayLayerChange={handleOverlayLayerChange}
-			/>
-
 			{activeMarker?.show && (
 				<PopoverPlay
 					position={activeMarker.position}
