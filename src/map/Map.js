@@ -187,10 +187,38 @@ export default function Map() {
 			}),
 		};
 
-		// // 创建新图层 TiledVectorLayer
-		const jjLayer = new L.supermap.TiledVectorLayer(jj,{
+		const jjLayer = new L.supermap.TiledVectorLayer(jj, {
 			cacheEnabled: true,
 			returnAttributes: true,
+		});
+
+		let selectId = null;
+		let selectLayerName = null;
+
+		function clearHighlight() {
+			if (selectId && selectLayerName) {
+				jjLayer.resetFeatureStyle(selectId, selectLayerName);
+			}
+			selectId = null;
+			selectLayerName = null;
+		}
+
+		jjLayer.on('click', function (evt) {
+			var id = evt.layer.properties.id;
+			var layerName = evt.layer.layerName;
+			clearHighlight();
+			selectId = id;
+			selectLayerName = layerName;
+			var selectStyle = {
+				fillColor: '#800026',
+				fillOpacity: 0.5,
+				stroke: true,
+				fill: true,
+				color: 'red',
+				opacity: 1,
+				weight: 2
+			};
+			jjLayer.setFeatureStyle(id, layerName, selectStyle);
 		});
 
 		baseLayers[activeBaseLayer].addTo(map);
@@ -221,7 +249,7 @@ export default function Map() {
 		const cities = L.layerGroup([BJ, CD]);
 		// const marks = { "标记": cities };
 
-		const marks = { 
+		const marks = {
 			"标记": cities,
 			"jj图层": jjLayer // 添加新图层到叠加层
 		};
@@ -264,7 +292,7 @@ export default function Map() {
 					/> */}
 					<LayerControl
 						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
-						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层" }} 
+						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层" }}
 						onBaseLayerChange={handleBaseLayerChange}
 						onOverlayLayerChange={handleOverlayLayerChange}
 						activeBaseLayer={activeBaseLayer}
