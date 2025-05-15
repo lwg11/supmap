@@ -3,10 +3,8 @@ import { Popover } from "antd";
 import L from 'leaflet';
 import './map.css';
 import '@supermapgis/iclient-leaflet';
-import { TiledMapLayer,TiledVectorLayer } from '@supermapgis/iclient-leaflet';
-
-let jj = 'https://iserver.supermap.io/iserver/services/map-Jingjin/rest/maps/京津地区地图'
-const BOUNDARY_LAYER_URL = 'https://iserver.supermap.io/iserver/services/map-china400/rest/maps/China';
+import { jj, BOUNDARY_LAYER_URL, key } from '../config';
+import { TiledMapLayer, TiledVectorLayer } from '@supermapgis/iclient-leaflet';
 
 const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayLayerChange, activeBaseLayer }) => {
 	return (
@@ -44,10 +42,8 @@ const complexMarkerEventHandler = (marker, setPopupData, setCoordinates, setActi
 		const { latlng } = e;
 		setPopupData(e.target._popup);
 		setCoordinates(latlng);
-
 		const map = mapRef.current;
 		const point = map.latLngToContainerPoint(latlng);
-
 		setActiveMarker(prov => {
 			return {
 				position: point,
@@ -74,7 +70,6 @@ const complexMarkerEventHandler = (marker, setPopupData, setCoordinates, setActi
 };
 
 const complexLayerManager = (map, baseLayers, baseLayersLabel, activeBaseLayer, overlayLayers, activeOverlayLayers) => {
-	// 辅助移除图层
 	const removeLayersFromMap = (layerCollection) => {
 		Object.values(layerCollection).forEach(layer => {
 			if (layer && layer.removeFrom) {
@@ -82,18 +77,15 @@ const complexLayerManager = (map, baseLayers, baseLayersLabel, activeBaseLayer, 
 			}
 		});
 	};
-
 	removeLayersFromMap(baseLayers);
 	removeLayersFromMap(baseLayersLabel);
-
 	if (baseLayers[activeBaseLayer]) {
 		baseLayers[activeBaseLayer].addTo(map);
 	}
 	if (baseLayersLabel[activeBaseLayer]) {
 		baseLayersLabel[activeBaseLayer].addTo(map);
 	}
-
-	// 处理叠加层
+	// 处理叠加
 	Object.entries(overlayLayers).forEach(([name, layer]) => {
 		const shouldShow = activeOverlayLayers.includes(name);
 		if (shouldShow && layer && layer.addTo) {
@@ -111,9 +103,6 @@ export default function Map() {
 	const [coordinate, setCoordinates] = useState({ lat: 0, lng: 0 });
 	const [popupData, setPopupData] = useState({});
 	const [activeMarker, setActiveMarker] = useState({ show: false });
-	const key = '38c85d6a0ba2503c80c339d1a9c684b3';
-	// const key = 'd9ca48dbdb5340a322938f75d26e11fd';
-
 	const [activeBaseLayer, setActiveBaseLayer] = useState('vec');
 	const [activeOverlayLayers, setActiveOverlayLayers] = useState([]);
 
@@ -140,7 +129,7 @@ export default function Map() {
 					return [...prev, name];
 				})();
 
-				// 调用图层管理函数更新图层显示状态
+				// 图层管理函数更新图层显示状态
 				complexLayerManager(
 					map,
 					layersRef.current.baseLayers,
@@ -157,7 +146,7 @@ export default function Map() {
 
 	useEffect(() => {
 		if (mapRef.current) return;
-		
+
 		const map = L.map('map', {
 			crs: L.supermap.CRS.TianDiTu_Mercator,
 			center: [33, 114],
@@ -213,9 +202,6 @@ export default function Map() {
 		jjLayer.on('click', function (evt) {
 			var id = evt.layer.properties.id;
 			var layerName = evt.layer.layerName;
-			console.log('click=id==>',id);
-			console.log('click=layerName==>',layerName);
-			
 			clearHighlight();
 			selectId = id;
 			selectLayerName = layerName;
@@ -293,8 +279,7 @@ export default function Map() {
 				<div className='layerControl-box'>
 					<LayerControl
 						baseLayers={{ "vec": "矢量地图", "img": "影像地图" }}
-						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层","行政区划": "省级边界" }}
-						// overlayLayers={{ "标记": "城市标记"}}
+						overlayLayers={{ "标记": "城市标记", "jj图层": "JJ 图层", "行政区划": "省级边界" }}
 						onBaseLayerChange={handleBaseLayerChange}
 						onOverlayLayerChange={handleOverlayLayerChange}
 						activeBaseLayer={activeBaseLayer}
