@@ -1,32 +1,32 @@
 const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayLayerChange, activeBaseLayer }) => {
-    return (
-        <div style={{ top: '20px', left: '20px', zIndex: 1000, background: 'white', padding: '10px', borderRadius: '5px' }}>
-            <h4>底图</h4>
-            {Object.entries(baseLayers).map(([name, layer]) => (
-                <div key={name}>
-                    <input
-                        type="radio"
-                        id={name}
-                        name="baseLayer"
-                        checked={name === activeBaseLayer}
-                        onChange={() => onBaseLayerChange(name)}
-                    />
-                    <label htmlFor={name}>{layer}</label>
-                </div>
-            ))}
-            <h4>图层控制</h4>
-            {Object.entries(overlayLayers).map(([name, layer]) => (
-                <div key={name} className='text-left'>
-                    <input
-                        type="checkbox"
-                        id={name}
-                        onChange={() => onOverlayLayerChange(name)}
-                    />
-                    <label htmlFor={name}>{layer}</label>
-                </div>
-            ))}
-        </div>
-    );
+	return (
+		<div style={{ top: '20px', left: '20px', zIndex: 1000, background: 'white', padding: '10px', borderRadius: '5px' }}>
+			<h4>底图</h4>
+			{Object.entries(baseLayers).map(([name, layer]) => (
+				<div key={name}>
+					<input
+						type="radio"
+						id={name}
+						name="baseLayer"
+						checked={name === activeBaseLayer}
+						onChange={() => onBaseLayerChange(name)}
+					/>
+					<label htmlFor={name}>{layer}</label>
+				</div>
+			))}
+			<h4>图层控制</h4>
+			{Object.entries(overlayLayers).map(([name, layer]) => (
+				<div key={name} className='text-left'>
+					<input
+						type="checkbox"
+						id={name}
+						onChange={() => onOverlayLayerChange(name)}
+					/>
+					<label htmlFor={name}>{layer}</label>
+				</div>
+			))}
+		</div>
+	);
 };
 
 const complexMarkerEventHandler = (marker, setPopupData, setCoordinates, setActiveMarker, mapRef, customIcon, highlightIcon) => {
@@ -88,4 +88,22 @@ const complexLayerManager = (map, baseLayers, baseLayersLabel, activeBaseLayer, 
 	});
 };
 
-export { LayerControl, complexMarkerEventHandler, complexLayerManager };
+function PopoverPlay({ position, content, coordinates }) {
+	return (
+		<div style={{
+			position: 'absolute',
+			right: position?.x,
+			top: position?.y,
+			background: 'white',
+			padding: '10px',
+			borderRadius: '5px',
+			boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+			zIndex: 1000
+		}}>
+			<h3 style={{ margin: 0 }}>{content}</h3>
+			<div>坐标：{coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}</div>
+		</div>
+	);
+}
+
+export { LayerControl, PopoverPlay, complexMarkerEventHandler, complexLayerManager };
