@@ -3,7 +3,7 @@ import { Popover } from "antd";
 import L from 'leaflet';
 import './map.css';
 import '@supermapgis/iclient-leaflet';
-import { jj, BOUNDARY_LAYER_URL, key } from '../config';
+import { jj, BOUNDARY_LAYER_URL, key } from './config';
 import { LayerControl, complexMarkerEventHandler, complexLayerManager } from './utils/tools';
 import { TiledMapLayer, TiledVectorLayer } from '@supermapgis/iclient-leaflet';
 
