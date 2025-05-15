@@ -11,6 +11,8 @@ export const manageLayers = (
   overlayLayers,
   activeOverlays
 ) => {
+  console.log('activeBase==>++',activeBase);
+  
   const removeLayers = (layers) => {
     Object.values(layers).forEach(layer => layer?.removeFrom(map));
   };

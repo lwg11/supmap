@@ -7,6 +7,13 @@ export const MAP_CONFIG = {
   zoom: 5,
 };
 
+export const SUPERMAP_CONFIG = {
+  crs: L.CRS.EPSG4326,
+  center: [33, 114],
+  maxZoom: 18,
+  zoom: 5,
+};
+
 export const BASE_LAYERS = {
   vec: {
     type: 'TiandituTileLayer',

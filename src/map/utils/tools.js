@@ -1,9 +1,32 @@
-const LayerControl = ({ baseLayers, overlayLayers, onBaseLayerChange, onOverlayLayerChange, activeBaseLayer }) => {
+const LayerControl = ({
+	baseLayers,
+	overlayLayers,
+	onBaseLayerChange,
+	onOverlayLayerChange,
+	activeBaseLayer,
+
+	baseMapLayers,
+	onBaseMapLayerChange,
+	activeBaseMapLayer
+}) => {
 	return (
 		<div style={{ top: '20px', left: '20px', zIndex: 1000, background: 'white', padding: '10px', borderRadius: '5px' }}>
-			<h4>底图</h4>
+			<h4>底图列表</h4>
+			{Object.entries(baseMapLayers).map(([name, layer]) => (
+				<div key={name} className='text-left'>
+					<input
+						type="radio"
+						id={name}
+						name="baseMapLayer"
+						checked={name === activeBaseMapLayer}
+						onChange={() => onBaseMapLayerChange(name)}
+					/>
+					<label htmlFor={name}>{layer}</label>
+				</div>
+			))}
+			<h4>地图类型</h4>
 			{Object.entries(baseLayers).map(([name, layer]) => (
-				<div key={name}>
+				<div key={name} className='text-left'>
 					<input
 						type="radio"
 						id={name}
